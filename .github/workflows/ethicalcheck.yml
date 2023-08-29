@@ -1,0 +1,91 @@
+<?php
+    $conn = mysqli_connect("localhost","root","","crud");
+
+    if(isset($_POST["submit"])){
+        if($_POST["submit"] == "add"){
+            add();
+        }
+        else if($_POST["submit"] == "edit"){
+            edit();
+        }
+        else if($_POST["submit"] == "add_comment"){
+            add_comment();
+        }
+        else{
+            delete();
+        }
+
+        }
+    
+        function add(){
+            global $conn;
+
+            $name = $_POST["name"];
+            $filename = $_FILES["file"]["name"];
+            $tmpName = $_FILES["file"]["tmp_name"];
+            $category = $_POST['category']; // Capturing the selected category
+            $newfilename = uniqid() . "-" . $filename;
+            $dd = $_POST["description"];
+            $price = $_POST["price"];
+            move_uploaded_file($tmpName, 'uploads/' . $newfilename);
+            $query = "INSERT INTO users VALUES('', '$name', '$newfilename', '$dd', '$price', '$category')";
+            mysqli_query($conn, $query);
+
+            echo" <script> alert('User Added Success'); document.location.href = 'admin_page.php'; </script>";
+        }
+    
+        function edit(){
+            global $conn;
+        
+            $id = $_GET["id"];
+            $name = $_POST["name"];
+            $dd = $_POST["dd"]; // Corrected to match the name attribute in the form
+            $price = $_POST["price"];
+            $category = $_POST['category'];
+            
+            if($_FILES["file"]["error"] != 4){
+                $filename = $_FILES["file"]["name"];
+                $tmpName = $_FILES["file"]["tmp_name"];
+                
+                $newfilename = uniqid() . "-" . $filename;
+        
+                move_uploaded_file($tmpName, 'uploads/' . $newfilename);
+                $query = "UPDATE users SET image = '$newfilename' WHERE id = $id";
+                mysqli_query($conn, $query);
+            }
+        
+            $query = "UPDATE users SET name = '$name', dd = '$dd', price = '$price', category = '$category' WHERE id = $id";
+            mysqli_query($conn, $query);
+        
+            echo "<script> alert('User Edit Success'); document.location.href = 'admin_page.php'; </script>";
+        }
+
+        function delete(){
+            global $conn;
+
+            $id = $_POST["submit"];
+
+            $query = "DELETE FROM users WHERE id = $id";
+            mysqli_query($conn, $query);
+
+            echo" <script> alert('User Deleted Success'); document.location.href = 'admin_page.php'; </script>";
+        }
+
+        function add_comment(){
+            global $conn;
+
+            $name = $_POST["name"];
+            $address = $_POST["address"];
+            $email = $_POST["email"];
+            $phone = $_POST["phone"];
+            // $filename = $_FILES["file"]["name"];
+            // $tmpName = $_FILES["file"]["tmp_name"];
+
+            // $newfilename = uniqid() . "-" . $filename;
+            $cnm = $_POST["cnm"];
+            $query = "INSERT INTO user_comment VALUES('', '$name', '$address', '$email', '$phone','$cnm')";
+            mysqli_query($conn, $query);
+
+            echo" <script> alert('User Comment Sent'); document.location.href = 'index.php'; </script>";
+        }
+   ?>
